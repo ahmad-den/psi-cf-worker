@@ -1024,6 +1024,36 @@ async function cacheResponse(kv, params, data) {
 }
 __name(cacheResponse, "cacheResponse");
 
+// src/config/deprecated-audits.ts
+var DEPRECATED_AUDITS = /* @__PURE__ */ new Set([
+  "critical-request-chains",
+  "dom-size",
+  "duplicated-javascript",
+  "efficient-animated-content",
+  "font-display",
+  "largest-contentful-paint-element",
+  "layout-shifts",
+  "lcp-lazy-loaded",
+  "modern-image-formats",
+  "non-composited-animations",
+  "prioritize-lcp-image",
+  "redirects",
+  "render-blocking-resources",
+  "server-response-time",
+  "third-party-summary",
+  "unsized-images",
+  "uses-long-cache-ttl",
+  "uses-optimized-images",
+  "uses-responsive-images",
+  "uses-text-compression",
+  "viewport",
+  "work-during-interaction"
+]);
+function isDeprecatedAudit(auditId) {
+  return DEPRECATED_AUDITS.has(auditId);
+}
+__name(isDeprecatedAudit, "isDeprecatedAudit");
+
 // src/services/psi-service.ts
 async function fetchPSIData(params, apiKey) {
   try {
@@ -1118,6 +1148,9 @@ function processUsingGoogleApproach(data) {
     organizedAudits.passed[group3] = {};
   });
   for (const [auditId, audit] of Object.entries(audits)) {
+    if (isDeprecatedAudit(auditId)) {
+      continue;
+    }
     if (audit && typeof audit === "object" && "score" in audit) {
       const score = audit.score;
       let group3 = auditGroupMap.get(auditId);
@@ -1154,6 +1187,9 @@ function extractCoreMetrics(audits, auditGroupMap) {
   };
   const extractedMetrics = {};
   Object.entries(coreMetricIds).forEach(([metricName, auditId]) => {
+    if (isDeprecatedAudit(auditId)) {
+      return;
+    }
     const group3 = auditGroupMap.get(auditId);
     if (group3 === "metrics" && audits[auditId]) {
       const audit = audits[auditId];

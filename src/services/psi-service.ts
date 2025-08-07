@@ -1,4 +1,5 @@
 import { TIMEOUTS } from "../config/constants"
+import { isDeprecatedAudit } from "../config/deprecated-audits"
 import type { RequestParams } from "../types/psi"
 
 export async function fetchPSIData(params: RequestParams, apiKey: string): Promise<any | null> {
@@ -118,6 +119,11 @@ function processUsingGoogleApproach(data: any): any {
 
   // Organize audits by score and proper group classification
   for (const [auditId, audit] of Object.entries(audits)) {
+    // Skip deprecated audits
+    if (isDeprecatedAudit(auditId)) {
+      continue
+    }
+    
     if (audit && typeof audit === "object" && "score" in audit) {
       const score = audit.score
 
@@ -166,6 +172,11 @@ function extractCoreMetrics(audits: Record<string, any>, auditGroupMap: Map<stri
   const extractedMetrics: Record<string, any> = {}
 
   Object.entries(coreMetricIds).forEach(([metricName, auditId]) => {
+    // Skip if this is a deprecated audit (though core metrics shouldn't be deprecated)
+    if (isDeprecatedAudit(auditId)) {
+      return
+    }
+    
     // Check if this audit is in the metrics group
     const group = auditGroupMap.get(auditId)
     if (group === "metrics" && audits[auditId]) {

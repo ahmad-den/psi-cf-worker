@@ -1,0 +1,49 @@
+#:schema node_modules/wrangler/config-schema.json
+name = "psi-api-worker"
+main = "src/index.ts"
+compatibility_date = "2024-12-01"
+compatibility_flags = ["nodejs_compat"]
+
+# KV Namespaces
+[[kv_namespaces]]
+binding = "PSI_CACHE"
+id = "6e37995bd9d749d5a75d5c1e3a0a0967"
+
+# Environment-specific configurations
+[env.staging]
+name = "psi-api-worker-staging"
+[[env.staging.kv_namespaces]]
+binding = "PSI_CACHE"
+id = "af0f6c2ff28244b0b880c5751c4d1095"
+
+[env.production]
+name = "psi-api-worker-production"
+[[env.production.kv_namespaces]]
+binding = "PSI_CACHE"
+id = "cdb82b16fcba454a8aede8c677515f3e"
+
+# Variables (non-sensitive)
+[vars]
+ENVIRONMENT = "development"
+
+[env.staging.vars]
+ENVIRONMENT = "staging"
+
+[env.production.vars]
+ENVIRONMENT = "production"
+
+# Secrets (set via wrangler secret put)
+# GOOGLE_PSI_API_KEY - Set via: wrangler secret put GOOGLE_PSI_API_KEY
+
+# Workers Logs Configuration
+[observability]
+enabled = true
+head_sampling_rate = 1.0
+
+[env.staging.observability]
+enabled = true
+head_sampling_rate = 1.0
+
+[env.production.observability]
+enabled = true
+head_sampling_rate = 0.1
